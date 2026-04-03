@@ -9,6 +9,7 @@ def createImage() {
   sh 'docker build -t 165.227.47.37:8083/java-app:1.0 .'
   sh 'echo $PASSWORD | docker login -u $USERNAME --password-stdin 165.227.47.37:8083'
   sh 'docker push 165.227.47.37:8083/java-app:1.0'
+  }
 }
 return this
 true
