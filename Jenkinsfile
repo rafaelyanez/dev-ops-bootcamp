@@ -5,6 +5,9 @@ pipeline {
     maven 'maven'
   }
   stages {
+    state("init") {
+      
+    }
     stage("build jar") {
       steps {
         script {
