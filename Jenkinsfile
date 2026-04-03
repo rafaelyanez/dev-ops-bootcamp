@@ -1,3 +1,4 @@
+def gv
 
 pipeline {
   agent any
@@ -8,26 +9,21 @@ pipeline {
     stage("init") {
       steps {
         script {
-          echo "init app..."
+          gv = load "script.groovy"
         }
       }
     }
     stage("build jar") {
       steps {
         script {
-          echo "building the application..."
-          sh "mvn package"
+          gv.build()
         }
       }
     }
     stage("build image") {
       steps {
         script {
-          echo "building docker image..."
-          withCredentials([usernamePassword(credentialsId: 'docker-credentials', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
-              sh 'docker build -t 165.227.47.37:8083/java-app:1.0 .'
-              sh 'echo $PASSWORD | docker login -u $USERNAME --password-stdin 165.227.47.37:8083'
-              sh 'docker push 165.227.47.37:8083/java-app:1.0'
+            gv.createImage()
           }
         }
       }
