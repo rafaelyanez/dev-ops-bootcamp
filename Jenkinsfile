@@ -1,60 +1,29 @@
-def gv
 
 pipeline {
   agent any
-  environment {
-    NEW_VERSION = '1.3.0'
-  }
-  parameters {
-    choice(name: 'VERSION', choices: ['1.1.0', '1.2.0', '1.3.0'], description: '')
-    booleanParam(name: 'executeTests', defaultValue: false, description: '')
-  }
   tools {
-    maven "maven"
+    maven 'maven'
   }
   stages {
-    stage("init") {
+    stage("build jar") {
       steps {
         script {
-          gv = load "script.groovy"
+          echo "building the application..."
+          sh "mvn package"
         }
       }
     }
-    stage("build") {
-
+    stage("build image") {
       steps {
         script {
-          gv.build()
+          echo "building docker image..."
+          withCredentials([usernamePassword(credentialsId: '46ac955a-53ea-4d8c-9369-a895c8a6c0d3', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+              sh 'docker build -t 165.227.47.37:8083/java-app:1.0 .
+              sh 'echo $PASSWORD | docker login -u $USERNAME --password-stdin 165.227.47.37:8083'
+              sh 'docker push 165.227.47.37:8083/java-app:1.0'
+          }
         }
       }
-
     }
-    stage("test") {
-      when {
-        expression {
-          params.executeTests
-        }
-      }
-      steps {
-        echo 'testing the application...'
-      }
-    }
-    stage("deploy") {
-      input {
-        message "Select the environment: "
-        ok "Done"
-        parameters {
-          
-          choice(name: 'ENV', choices: ['dev', 'staging', 'prod'], description: '')
-        }
-      }
-      steps {
-        echo 'deploy the application...'
-        echo "deploy version ${params.VERSION}"
-        echo "deploy to ${ENV}"
-      }
-    }
-
   }
-
 }
