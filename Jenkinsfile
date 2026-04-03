@@ -6,7 +6,11 @@ pipeline {
   }
   stages {
     stage("init") {
-      
+      steps {
+        script {
+          echo "init app..."
+        }
+      }
     }
     stage("build jar") {
       steps {
